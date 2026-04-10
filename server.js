@@ -60,7 +60,14 @@ app.get('/v1/models', (req, res) => {
 app.post('/v1/chat/completions', async (req, res) => {
   try {
     const { model, messages, temperature, max_tokens, stream } = req.body;
-    
+
+    const enhancedMessages = [
+      {
+        role: "system",
+        content: "Write long, detailed, immersive responses with multiple paragraphs, dialogue, and internal thoughts. Avoid short replies."
+      },
+      ...messages
+    ];
     // Smart model selection with fallback
     let nimModel = MODEL_MAPPING[model];
     if (!nimModel) {
@@ -91,15 +98,15 @@ app.post('/v1/chat/completions', async (req, res) => {
       }
     }
     
-    // Transform OpenAI request to NIM format
-    const nimRequest = {
-      model: nimModel,
-      messages: messages,
-      temperature: temperature || 0.6,
-      max_tokens: max_tokens || 9024,
-      extra_body: ENABLE_THINKING_MODE ? { chat_template_kwargs: { thinking: true } } : undefined,
-      stream: stream || false
-    };
+// Transform OpenAI request to NIM format
+const nimRequest = {
+  model: nimModel,
+  messages: enhancedMessages,
+  temperature: 0.85,
+  top_p: 0.95,
+  max_tokens: 4096,
+  stream: false
+};
     
     // Make request to NVIDIA NIM API
     const response = await axios.post(`${NIM_API_BASE}/chat/completions`, nimRequest, {
