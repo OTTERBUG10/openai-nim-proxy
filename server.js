@@ -118,7 +118,7 @@ app.post('/v1/chat/completions', async (req, res) => {
       responseType: 'json'
     });
     
-    if (stream) {
+    if (false) {
       // Handle streaming response with reasoning
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache');
